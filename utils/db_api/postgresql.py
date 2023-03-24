@@ -24,7 +24,8 @@ class DataBase:
         return await self.pool.fetchval("SELECT EXISTS(SELECT id FROM client WHERE id = $1)", str(id))
 
     async def add_user(self, id, username):
-        return await self.pool.execute("INSERT INTO client (id, username, status) VALUES ($1, $2, $3)", str(id), username, False)
+        return await self.pool.execute("INSERT INTO client (id, username, status) VALUES ($1, $2, $3)", str(id),
+                                       username, False)
 
     async def update_status(self, id, status):
         return await self.pool.execute('UPDATE client SET status=$2 where id=$1', str(id), status)
@@ -33,10 +34,13 @@ class DataBase:
         return await self.pool.fetchval("SELECT status from client where id = $1", str(id))
 
     async def add_manager(self, username, сity, department):
-        return await self.pool.execute("INSERT INTO manager (username, city, department, applications) VALUES ($1,$2,$3,$4)", username, сity, department, 0)
+        return await self.pool.execute(
+            "INSERT INTO manager (username, city, department, applications) VALUES ($1,$2,$3,$4)", username, сity,
+            department, 0)
 
     async def presence_manager(self, username):
-        return await self.pool.fetchval("SELECT EXISTS(SELECT username FROM manager WHERE username = $1)", str(username))
+        return await self.pool.fetchval("SELECT EXISTS(SELECT username FROM manager WHERE username = $1)",
+                                        str(username))
 
     async def count_manager(self):
         return await self.pool.fetchval("SELECT count(*) FROM manager")
@@ -48,7 +52,8 @@ class DataBase:
         return await self.pool.fetch("SELECT username, city FROM manager LIMIT $1 OFFSET $2", 5, k)
 
     async def update_applications(self, username):
-        return await self.pool.execute('UPDATE manager SET applications=applications+1 where username=$1', str(username))
+        return await self.pool.execute('UPDATE manager SET applications=applications+1 where username=$1',
+                                       str(username))
 
     async def select_applications(self):
         return await self.pool.fetch('SELECT username, applications FROM manager')
@@ -60,7 +65,8 @@ class DataBase:
         return await self.pool.fetchval("SELECT count(*) FROM client")
 
     async def add_request(self, id, сity, department):
-        return await self.pool.execute("INSERT INTO request (id, сity, department) VALUES ($1, $2, $3)", str(id), сity, department)
+        return await self.pool.execute("INSERT INTO request (id, сity, department) VALUES ($1, $2, $3)", str(id), сity,
+                                       department)
 
     async def count_city_irkutsk(self):
         return await self.pool.fetchval("SELECT count(*) FROM request where city=$1", "Иркутск")
@@ -69,7 +75,18 @@ class DataBase:
         return await self.pool.fetchval("SELECT count(*) FROM request where city=$1", "Москва")
 
     async def count_city(self):
-        return await self.pool.fetchrow("SELECT count(*) as s1, (SELECT count(*) as s2 FROM request WHERE сity = $1) From request where сity = $2", "Иркутск", "Москва")
+        return await self.pool.fetchrow(
+            "SELECT count(*) as s1, (SELECT count(*) as s2 FROM request WHERE сity = $1) From request where сity = $2",
+            "Иркутск", "Москва")
 
     async def count_department(self):
-        return await self.pool.fetchrow("SELECT count(*) as s1, (SELECT count(*) as s2 FROM request WHERE department = $1 ), (SELECT count(*) as s3 FROM request WHERE department = $2) From request where department = $3", "ремонт", "хостинг", "продажа")
+        return await self.pool.fetchrow("SELECT count(*) as s1,"
+                                        "(SELECT count(*) as s2 FROM request WHERE department = $1),"
+                                        "(SELECT count(*) as s3 FROM request WHERE department = $2),"
+                                        "(SELECT count(*) as s4 FROM request WHERE department = $3),"
+                                        "(SELECT count(*) as s5 FROM request WHERE department = $4) "
+                                        "From request where department = $5",'хостинг', 'покупка', 'лизинг', 'ремонт', 'другое')
+
+
+    async def all_client_txt(self):
+        return await self.pool.fetch("SELECT username FROM client")

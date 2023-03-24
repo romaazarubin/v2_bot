@@ -3,6 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from main import dp, bot, db
 from keyboards.keyboard_client import button_city, button_option, keyboard_city, cd_option
 from keyboards.keyboard_manager import cd_request, keyboard_request
+from config import chat_id
 
 
 @dp.message_handler(Command('start'))
@@ -15,10 +16,12 @@ async def start(message: Message):
         pass
     finally:
         await bot.send_message(chat_id=message.from_user.id,
-                               text='команда для вызова обращения в тех.поддержку - /help')
+                               text='Приветствую! Я бот компании Leomining, готов помочь вам с любыми вопросами, '
+                                    'связанными с оборудованием для майнинга криптовалют. Чем я могу вам помочь ? '
+                                    'Выбрать услугу - /menu')
 
 
-@dp.message_handler(Command('help'))
+@dp.message_handler(Command('menu'))
 async def option(message: Message):
     try:
         status = await db.check_status(message.from_user.id)
@@ -34,7 +37,7 @@ async def option(message: Message):
                                text='Произошла ошибка попробуйте позже')
 
 
-@dp.callback_query_handler(Text(equals=['ремонт', 'хостинг', 'покупка']))
+@dp.callback_query_handler(Text(equals=['ремонт', 'хостинг', 'покупка', 'лизинг', 'другое']))
 async def city(call: CallbackQuery):
     await call.message.edit_text(text='Выберите город', reply_markup=keyboard_city(call.data, call.from_user.id))
 
@@ -47,8 +50,8 @@ async def cd(call: CallbackQuery, callback_data: dict):
         pass
     finally:
         await call.message.edit_text(text='Запрос отправлен')
-        await bot.send_message(-968033783,
-                               text=f'Пользователь {call.from_user.username} из города {callback_data.get("city")} оставил завку',
+        await bot.send_message(chat_id,
+                               text=f'Пользователь {call.from_user.username} из города {callback_data.get("city")} оставил завку на {callback_data.get("option")}',
                                reply_markup=keyboard_request(callback_data.get("option"),
                                                              callback_data.get("user_id"),
                                                              callback_data.get("city")))
@@ -68,4 +71,4 @@ async def back(call: CallbackQuery):
 
 @dp.callback_query_handler(text_contains='city_cancel')
 async def city_cancel(call: CallbackQuery):
-    await call.message.edit_text(text='команда для вызова обращения в тех.поддержку - /help')
+    await call.message.edit_text(text='Чем я могу вам помочь ?Выбрать услугу - /menu')

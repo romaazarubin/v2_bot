@@ -20,6 +20,20 @@ admin_main = InlineKeyboardMarkup(
     ]
 )
 
+client_stats = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text='В меню', callback_data='list_client_menu')
+        ],
+        [
+            InlineKeyboardButton(text='Файлом txt', callback_data='list_client_txt')
+        ],
+        [
+            InlineKeyboardButton(text='Вернуться назад', callback_data='admin_main')
+        ]
+    ]
+)
+
 admin_addManager = InlineKeyboardMarkup(
     inline_keyboard=[
         [
@@ -65,7 +79,7 @@ def all_manager(data, count, call, step=0):
             markup.row(back, next)
         return markup
 
-    elif call == 'list_client' or call == 'nextclient' or call == 'backclient':
+    elif call == 'list_client_menu' or call == 'nextclient' or call == 'backclient':
         for i in data:
             username = i['username']
             if username == None:

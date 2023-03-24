@@ -9,7 +9,7 @@ async def answer(call: CallbackQuery, callback_data: dict):
     lst = dict(await db.check_city(call.from_user.username))
     if callback_data.get('city').lower() in lst["city"].split("-") and callback_data.get('option').lower() in lst["department"].split("-"):
         await bot.send_message(callback_data.get('user_id'),
-                               text=f'Ссылка на контакт с менеджером @{call.from_user.username}')
+                               text=f'Контакт менеджера - Ваш личный менеджер @{call.from_user.username}')
         await call.message.delete()
         await call.message.answer(text='Заявка принята')
         await db.update_status(callback_data.get('user_id'), False)

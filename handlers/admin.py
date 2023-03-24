@@ -1,9 +1,11 @@
+import os
+
 from aiogram.dispatcher.filters import Command, Text
 from aiogram.types import Message, CallbackQuery
 from main import dp, bot, db
 from keyboards.keyboard_manager import cd_request
 from keyboards.keyboard_admin import admin_main, admin_addManager, cd_good_next_menu, cd_good_back_menu, cd_manager, \
-    all_manager
+    all_manager, client_stats
 from config import admin_id
 from keyboards.keyboard_stats import keyboard_stats, manager_stats, city_stats, department_stats
 from aiogram.dispatcher import FSMContext
@@ -23,7 +25,7 @@ async def cancel_request(call: CallbackQuery, callback_data: dict):
 @dp.message_handler(Command('admin'))
 async def admin_main_menu(message: Message):
     if message.from_user.id == admin_id:
-        await bot.send_message(chat_id=admin_id, text='Основное меню', reply_markup=admin_main)
+        await bot.send_message(chat_id=admin_id, text='Основное меню - УПРАВЛЕНИЕ', reply_markup=admin_main)
 
 
 @dp.callback_query_handler(text_contains='edit_list_manager')
@@ -33,7 +35,7 @@ async def edit_list_manager(call: CallbackQuery):
 
 @dp.callback_query_handler(text_contains='admin_main')
 async def admin_back_main(call: CallbackQuery):
-    await call.message.edit_text(text='Основное меню', reply_markup=admin_main)
+    await call.message.edit_text(text='Основное меню - УПРАВЛЕНИЕ ', reply_markup=admin_main)
 
 
 @dp.callback_query_handler(text_contains='add_manager')
@@ -62,7 +64,7 @@ async def username(message: Message, state: FSMContext):
         }
     )
     await bot.send_message(message.from_user.id,
-                           text='Введите услугу, если онф не однф то вводите через "-". Пример "Ремонт-Хостинг"')
+                           text='Введите услугу, если онa не однa то вводите через "-". Пример "Ремонт-Хостинг-Другое"')
     await AddManager.department.set()
 
 
@@ -113,10 +115,9 @@ async def delete_manag(call: CallbackQuery, callback_data: dict):
         data = await db.all_manager(0)
         count = await db.count_manager()
         await call.message.edit_reply_markup(reply_markup=all_manager(data, count, call.data.split(":")[0]))
-        #await call.message.answer(text=call.data)
     except:
         await call.answer('Произошла ошибка')
-        await call.message.edit_text(text='Основное меню', reply_markup=admin_main)
+        await call.message.edit_text(text='Основное меню - УПРАВЛЕНИЕ', reply_markup=admin_main)
 
 
 @dp.callback_query_handler(text_contains='remove_manager')
@@ -138,12 +139,26 @@ async def info_manager(call: CallbackQuery):
     await call.message.edit_text(text='Статистика по менежерам', reply_markup=manager_stats(data))
 
 
-@dp.callback_query_handler(text_contains='list_client')
-async def remove_manager(call: CallbackQuery):
+@dp.callback_query_handler(text_contains='list_client_txt')
+async def list_client_txt(call: CallbackQuery):
+    await call.message.delete()
+    data = await db.all_client_txt()
+    with open("infoClient.txt", "w") as file:
+        for i in data:
+            file.write(f"{str(i['username'])}\n")
+    await bot.send_document(call.from_user.id, document=open("infoClient.txt", "rb"))
+    await call.message.answer(text='Основное меню - УПРАВЛЕНИЕ',  reply_markup=admin_main)
+    os.remove("infoClient.txt")
+
+@dp.callback_query_handler(text_contains='list_client_menu')
+async def list_client_menu(call: CallbackQuery):
     data = await db.all_client(0)
     count = await db.count_client()
-    await call.message.edit_text(text='Список клиентов',
-                                 reply_markup=all_manager(data, count, call.data))
+    await call.message.edit_text(text='Список клиентов', reply_markup=all_manager(data, count, call.data))
+
+@dp.callback_query_handler(text_contains='list_client')
+async def list_client(call: CallbackQuery):
+    await call.message.edit_text(text='Получить информацию в ...', reply_markup=client_stats)
 
 
 @dp.callback_query_handler(cd_good_next_menu.filter(action='next', type='client'))

@@ -41,13 +41,19 @@ button_city = InlineKeyboardMarkup(
 button_option = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text='Ремонт', callback_data='ремонт')
+            InlineKeyboardButton(text='Покупка оборудования', callback_data='покупка')
         ],
         [
             InlineKeyboardButton(text='Хостинг', callback_data='хостинг')
         ],
         [
-            InlineKeyboardButton(text='Покупка', callback_data='покупка')
+            InlineKeyboardButton(text='Ремонт оборудования', callback_data='ремонт')
+        ],
+        [
+            InlineKeyboardButton(text='Лизинг', callback_data='лизинг')
+        ],
+        [
+            InlineKeyboardButton(text='Другой вопрос', callback_data='другое')
         ],
         [
             InlineKeyboardButton(text='Отмена', callback_data='city_cancel')

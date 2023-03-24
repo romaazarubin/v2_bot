@@ -39,11 +39,15 @@ def department_stats(data):
     repair = data["s1"]
     hosting = data["s2"]
     purchase = data["s3"]
+    leasing = data["s4"]
+    other = data["s5"]
     btn1 = InlineKeyboardButton(text=f'Ремонт: {repair}', callback_data='rep')
     btn2 = InlineKeyboardButton(text=f'Хостинг: {hosting}', callback_data='hos')
-    btn3 = InlineKeyboardButton(text=f'Продажа {purchase}', callback_data='pur')
-    btn4 = InlineKeyboardButton(text='Вернуться назад', callback_data='admin_main')
-    markup.add(btn1, btn2, btn3, btn4)
+    btn3 = InlineKeyboardButton(text=f'Продажа: {purchase}', callback_data='pur')
+    btn4 = InlineKeyboardButton(text=f'Лизинг: {leasing}', callback_data='leasing')
+    btn5 = InlineKeyboardButton(text=f'Другое:  {other}', callback_data='other')
+    btn6 = InlineKeyboardButton(text='Вернуться назад', callback_data='admin_main')
+    markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
     return markup
 
 
