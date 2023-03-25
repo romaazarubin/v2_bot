@@ -33,9 +33,9 @@ class DataBase:
     async def check_status(self, id):
         return await self.pool.fetchval("SELECT status from client where id = $1", str(id))
 
-    async def add_manager(self, username, сity, department):
+    async def add_manager(self, username, city, department):
         return await self.pool.execute(
-            "INSERT INTO manager (username, city, department, applications) VALUES ($1,$2,$3,$4)", username, сity,
+            "INSERT INTO manager (username, city, department, applications) VALUES ($1,$2,$3,$4)", username, city,
             department, 0)
 
     async def presence_manager(self, username):
@@ -64,8 +64,8 @@ class DataBase:
     async def count_client(self):
         return await self.pool.fetchval("SELECT count(*) FROM client")
 
-    async def add_request(self, id, сity, department):
-        return await self.pool.execute("INSERT INTO request (id, сity, department) VALUES ($1, $2, $3)", str(id), сity,
+    async def add_request(self, id, city, department):
+        return await self.pool.execute("INSERT INTO request (id, city, department) VALUES ($1, $2, $3)", str(id), city,
                                        department)
 
     async def count_city_irkutsk(self):
@@ -76,7 +76,7 @@ class DataBase:
 
     async def count_city(self):
         return await self.pool.fetchrow(
-            "SELECT count(*) as s1, (SELECT count(*) as s2 FROM request WHERE сity = $1) From request where сity = $2",
+            "SELECT count(*) as s1, (SELECT count(*) as s2 FROM request WHERE city = $1) From request where city = $2",
             "Иркутск", "Москва")
 
     async def count_department(self):
@@ -84,8 +84,7 @@ class DataBase:
                                         "(SELECT count(*) as s2 FROM request WHERE department = $1),"
                                         "(SELECT count(*) as s3 FROM request WHERE department = $2),"
                                         "(SELECT count(*) as s4 FROM request WHERE department = $3),"
-                                        "(SELECT count(*) as s5 FROM request WHERE department = $4) "
-                                        "From request where department = $5",'хостинг', 'покупка', 'лизинг', 'ремонт', 'другое')
+                                        "From request where department = $4",'хостинг', 'покупка', 'ремонт', 'другое')
 
 
     async def all_client_txt(self):

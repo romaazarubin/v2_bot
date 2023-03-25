@@ -37,7 +37,7 @@ async def option(message: Message):
                                text='Произошла ошибка попробуйте позже')
 
 
-@dp.callback_query_handler(Text(equals=['ремонт', 'хостинг', 'покупка', 'лизинг', 'другое']))
+@dp.callback_query_handler(Text(equals=['ремонт', 'хостинг', 'покупка', 'другое']))
 async def city(call: CallbackQuery):
     await call.message.edit_text(text='Выберите город', reply_markup=keyboard_city(call.data, call.from_user.id))
 

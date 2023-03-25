@@ -50,9 +50,6 @@ button_option = InlineKeyboardMarkup(
             InlineKeyboardButton(text='Ремонт оборудования', callback_data='ремонт')
         ],
         [
-            InlineKeyboardButton(text='Лизинг', callback_data='лизинг')
-        ],
-        [
             InlineKeyboardButton(text='Другой вопрос', callback_data='другое')
         ],
         [
