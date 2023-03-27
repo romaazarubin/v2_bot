@@ -83,7 +83,7 @@ class DataBase:
         return await self.pool.fetchrow("SELECT count(*) as s1,"
                                         "(SELECT count(*) as s2 FROM request WHERE department = $1),"
                                         "(SELECT count(*) as s3 FROM request WHERE department = $2),"
-                                        "(SELECT count(*) as s4 FROM request WHERE department = $3),"
+                                        "(SELECT count(*) as s4 FROM request WHERE department = $3)"
                                         "From request where department = $4",'хостинг', 'покупка', 'ремонт', 'другое')
 
 

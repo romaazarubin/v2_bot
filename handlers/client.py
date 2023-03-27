@@ -14,15 +14,6 @@ async def start(message: Message):
             await db.add_user(message.from_user.id, message.from_user.username)
     except:
         pass
-    finally:
-        await bot.send_message(chat_id=message.from_user.id,
-                               text='Приветствую! Я бот компании Leomining, готов помочь вам с любыми вопросами, '
-                                    'связанными с оборудованием для майнинга криптовалют. Чем я могу вам помочь ? '
-                                    'Выбрать услугу - /menu')
-
-
-@dp.message_handler(Command('menu'))
-async def option(message: Message):
     try:
         status = await db.check_status(message.from_user.id)
         if status:
@@ -30,11 +21,33 @@ async def option(message: Message):
                                    text='Вы уже отправили запрос, подождите пока вам на него ответят')
         else:
             await bot.send_message(chat_id=message.from_user.id,
-                                   text='Выберите услугу',
+                                   text='Выберите услугу:',
                                    reply_markup=button_option)
     except:
         await bot.send_message(message.from_user.id,
                                text='Произошла ошибка попробуйте позже')
+
+
+# @dp.message_handler(Command('menu'))
+# async def option(message: Message):
+#     try:
+#         k = await db.presence_user(message.from_user.id)
+#         if not k:
+#             await db.add_user(message.from_user.id, message.from_user.username)
+#     except:
+#         pass
+#     try:
+#         status = await db.check_status(message.from_user.id)
+#         if status:
+#             await bot.send_message(message.from_user.id,
+#                                    text='Вы уже отправили запрос, подождите пока вам на него ответят')
+#         else:
+#             await bot.send_message(chat_id=message.from_user.id,
+#                                    text='Выберите услугу',
+#                                    reply_markup=button_option)
+#     except:
+#         await bot.send_message(message.from_user.id,
+#                                text='Произошла ошибка попробуйте позже')
 
 
 @dp.callback_query_handler(Text(equals=['ремонт', 'хостинг', 'покупка', 'другое']))
@@ -69,6 +82,7 @@ async def back(call: CallbackQuery):
     except:
         await call.message.edit_text(text='Произошла ошибка попробуйте позже')
 
+
 @dp.callback_query_handler(text_contains='city_cancel')
 async def city_cancel(call: CallbackQuery):
-    await call.message.edit_text(text='Чем я могу вам помочь ?Выбрать услугу - /menu')
+    await call.message.edit_text(text='Чем я могу вам помочь ?Выбрать услугу - /start')

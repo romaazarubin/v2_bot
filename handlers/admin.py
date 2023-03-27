@@ -14,7 +14,7 @@ from state.add_state import AddManager
 
 @dp.callback_query_handler(cd_request.filter(action='cancel'))
 async def cancel_request(call: CallbackQuery, callback_data: dict):
-    if call.from_user.id == admin_id:
+    if call.from_user.id in admin_id:
         await call.message.delete()
         await db.update_status(callback_data.get('user_id'), False)
         await call.answer(text="Заявка удалена")
@@ -24,8 +24,8 @@ async def cancel_request(call: CallbackQuery, callback_data: dict):
 
 @dp.message_handler(Command('admin'))
 async def admin_main_menu(message: Message):
-    if message.from_user.id == admin_id:
-        await bot.send_message(chat_id=admin_id, text='Основное меню - УПРАВЛЕНИЕ', reply_markup=admin_main)
+    if message.from_user.id in admin_id:
+        await bot.send_message(chat_id=message.from_user.id, text='Основное меню - УПРАВЛЕНИЕ', reply_markup=admin_main)
 
 
 @dp.callback_query_handler(text_contains='edit_list_manager')
@@ -64,7 +64,7 @@ async def username(message: Message, state: FSMContext):
         }
     )
     await bot.send_message(message.from_user.id,
-                           text='Введите услугу, если онa не однa то вводите через "-". Пример "Ремонт-Хостинг-Другое"')
+                           text='Введите услугу, если онa не однa то вводите через "-". Пример "Ремонт-Хостинг-Покупка-Другое"')
     await AddManager.department.set()
 
 
@@ -141,14 +141,18 @@ async def info_manager(call: CallbackQuery):
 
 @dp.callback_query_handler(text_contains='list_client_txt')
 async def list_client_txt(call: CallbackQuery):
-    await call.message.delete()
-    data = await db.all_client_txt()
-    with open("infoClient.txt", "w") as file:
-        for i in data:
-            file.write(f"{str(i['username'])}\n")
-    await bot.send_document(call.from_user.id, document=open("infoClient.txt", "rb"))
-    await call.message.answer(text='Основное меню - УПРАВЛЕНИЕ',  reply_markup=admin_main)
-    os.remove("infoClient.txt")
+    try:
+        await call.message.delete()
+        data = await db.all_client_txt()
+        with open("infoClient.txt", "w") as file:
+            for i in data:
+                file.write(f"{str(i['username'])}\n")
+        await bot.send_document(call.from_user.id, document=open("infoClient.txt", "rb"))
+        await call.message.answer(text='Основное меню - УПРАВЛЕНИЕ',  reply_markup=admin_main)
+        os.remove("infoClient.txt")
+    except:
+        os.remove("infoClient.txt")
+        await call.message.answer(text='В списке нет клиентов', reply_markup=admin_main)
 
 @dp.callback_query_handler(text_contains='list_client_menu')
 async def list_client_menu(call: CallbackQuery):

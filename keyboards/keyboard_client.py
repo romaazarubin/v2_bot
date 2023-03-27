@@ -44,10 +44,10 @@ button_option = InlineKeyboardMarkup(
             InlineKeyboardButton(text='Покупка оборудования', callback_data='покупка')
         ],
         [
-            InlineKeyboardButton(text='Хостинг', callback_data='хостинг')
+            InlineKeyboardButton(text='Ремонт оборудования', callback_data='ремонт')
         ],
         [
-            InlineKeyboardButton(text='Ремонт оборудования', callback_data='ремонт')
+            InlineKeyboardButton(text='Хостинг', callback_data='хостинг')
         ],
         [
             InlineKeyboardButton(text='Другой вопрос', callback_data='другое')
