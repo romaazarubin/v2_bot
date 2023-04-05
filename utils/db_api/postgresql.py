@@ -24,7 +24,8 @@ class DataBase:
         return await self.pool.fetchval("SELECT EXISTS(SELECT id FROM client WHERE id = $1)", str(id))
 
     async def add_user(self, id, username):
-        return await self.pool.execute("INSERT INTO client (id, username, status) VALUES ($1, $2, $3)", str(id),
+        return await self.pool.execute("INSERT INTO client (id, username, status) VALUES ($1, $2, $3)",
+                                       str(id),
                                        username, False)
 
     async def update_status(self, id, status):
@@ -84,8 +85,50 @@ class DataBase:
                                         "(SELECT count(*) as s2 FROM request WHERE department = $1),"
                                         "(SELECT count(*) as s3 FROM request WHERE department = $2),"
                                         "(SELECT count(*) as s4 FROM request WHERE department = $3)"
-                                        "From request where department = $4",'хостинг', 'покупка', 'ремонт', 'другое')
-
+                                        "From request where department = $4", 'хостинг', 'покупка', 'другое', 'ремонт')
 
     async def all_client_txt(self):
         return await self.pool.fetch("SELECT username FROM client")
+
+    async def select_manager_day(self, year, month, day):
+        return await self.pool.fetch(
+            "select username, count(date_req) as applications from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 group by username",
+            year, month, day)
+
+    async def select_manager_month(self, year, month):
+        return await self.pool.fetch(
+            "select username, count(date_req) as applications from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 group by username",
+            year, month)
+
+    async def select_city_day(self, year, month, day):
+        return await self.pool.fetchrow(
+            "select count(date_req) as s1, (select count(date_req) as s2 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and city='Иркутск') from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and city='Москва'",
+            year, month, day)
+
+    async def select_city_month(self, year, month):
+        return await self.pool.fetchrow("select count(date_req) as s1,"
+                                        "(select count(date_req) as s2 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and city='Иркутск') "
+                                        "from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and city='Москва'",
+                                        year, month)
+
+    async def select_department_day(self, year, month, day):
+        return await self.pool.fetchrow("select count(date_req) as s1, "
+                                        "(select count(date_req) as s2 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and department='хостинг'),"
+                                        "(select count(date_req) as s3 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and department='покупка'),"
+                                        "(select count(date_req) as s4 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and department='другое') "
+                                        "from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and extract(day from date_req) = $3 and department='ремонт'",
+                                        year, month, day)
+
+    async def select_department_month(self, year, month):
+        return await self.pool.fetchrow("select count(date_req) as s1, "
+                                        "(select count(date_req) as s2 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and department='хостинг'),"
+                                        "(select count(date_req) as s3 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and department='покупка'),"
+                                        "(select count(date_req) as s4 from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and department='другое') "
+                                        "from manager_app where extract(year from date_req) = $1 and extract(month from date_req) = $2 and department='ремонт'",
+                                        year, month)
+
+    async def manager_app_add(self, username, date_req, department, city):
+        return await self.pool.execute('INSERT INTO manager_app (username, date_req, department, city) VALUES ($1, $2, $3, $4)', username, date_req, department, city)
+
+    async def select_username_client(self, user_id):
+        return await self.pool.fetchval("SELECT username from client where id=$1", str(user_id))

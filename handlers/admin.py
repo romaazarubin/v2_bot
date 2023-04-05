@@ -10,6 +10,7 @@ from config import admin_id
 from keyboards.keyboard_stats import keyboard_stats, manager_stats, city_stats, department_stats
 from aiogram.dispatcher import FSMContext
 from state.add_state import AddManager
+from keyboards.keyboard_period import keyboard_period_manager, keyboard_period_city, keyboard_period_department
 
 
 @dp.callback_query_handler(cd_request.filter(action='cancel'))
@@ -135,8 +136,8 @@ async def stats(call: CallbackQuery):
 
 @dp.callback_query_handler(text_contains='infoManager')
 async def info_manager(call: CallbackQuery):
-    data = await db.select_applications()
-    await call.message.edit_text(text='Статистика по менежерам', reply_markup=manager_stats(data))
+    #data = await db.select_applications()
+    await call.message.edit_text(text='Статистика по менежерам', reply_markup=keyboard_period_manager)
 
 
 @dp.callback_query_handler(text_contains='list_client_txt')
@@ -185,10 +186,10 @@ async def back_menu(call: CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(text_contains='infoCity')
 async def info_sity(call: CallbackQuery):
-    data = await db.count_city()
-    await call.message.edit_text(text=f'Статистика по городам', reply_markup=city_stats(dict(data)))
+    #data = await db.count_city()
+    await call.message.edit_text(text='Статистика по городам', reply_markup=keyboard_period_city)
 
 @dp.callback_query_handler(text_contains='infoApplic')
 async def info_applic(call: CallbackQuery):
-    data = await db.count_department()
-    await call.message.edit_text(text=f'Статистика по услугам', reply_markup=department_stats(dict(data)))
+    #data = await db.count_department()
+    await call.message.edit_text(text='Статистика по услугам', reply_markup=keyboard_period_department)
