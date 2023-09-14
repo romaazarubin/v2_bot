@@ -53,8 +53,20 @@ async def username(message: Message, state: FSMContext):
         }
     )
     await bot.send_message(message.from_user.id,
+                           text='Введите id телеграмма менеджера')
+    await AddManager.manager_id.set()
+
+@dp.message_handler(state=AddManager.manager_id)
+async def username(message: Message, state: FSMContext):
+    await state.update_data(
+        {
+            'manager_id': str(message.text)
+        }
+    )
+    await bot.send_message(message.from_user.id,
                            text='Введите город, если он не один то вводите через "-". Пример "Москва-Иркутск"')
     await AddManager.city.set()
+
 
 
 @dp.message_handler(state=AddManager.city)
@@ -74,9 +86,10 @@ async def username(message: Message, state: FSMContext):
     data = await state.get_data()
     k = await db.presence_manager(data.get("username"))
     if not k:
-        await db.add_manager(data.get("username").lower(), data.get("city").lower(), message.text.lower())
+        await db.add_manager(data.get("username").lower(), data.get("manager_id").lower(), data.get("city").lower(), message.text.lower())
         await bot.send_message(message.from_user.id,
                                text=f'Username:{data.get("username")}\n'
+                                    f'Maneger_id:{data.get("manager_id")}\n'
                                     f'Город:{data.get("city")}\n'
                                     f'Услуги:{message.text}\n'
                                     f'Добавлен в менеджеры!',
@@ -84,6 +97,7 @@ async def username(message: Message, state: FSMContext):
     else:
         await bot.send_message(message.from_user.id,
                                text=f'Username:{data.get("username")}\n'
+                                    f'Maneger_id:{data.get("manager_id")}\n'
                                     f'Город:{data.get("city")}\n'
                                     f'Услуги:{message.text}\n'
                                     f'Уже есть в списке!',

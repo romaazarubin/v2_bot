@@ -34,9 +34,9 @@ class DataBase:
     async def check_status(self, id):
         return await self.pool.fetchval("SELECT status from client where id = $1", str(id))
 
-    async def add_manager(self, username, city, department):
+    async def add_manager(self, username, manager_id, city, department):
         return await self.pool.execute(
-            "INSERT INTO manager (username, city, department, applications) VALUES ($1,$2,$3,$4)", username, city,
+            "INSERT INTO manager (username, manager_id, city, department, applications) VALUES ($1,$2,$3,$4,$5)", username, manager_id, city,
             department, 0)
 
     async def presence_manager(self, username):
@@ -132,3 +132,19 @@ class DataBase:
 
     async def select_username_client(self, user_id):
         return await self.pool.fetchval("SELECT username from client where id=$1", str(user_id))
+
+    async def select_manager(self, city, department):
+        return await self.pool.fetchrow("select username, manager_id from manager where number = (SELECT MIN(number) FROM manager where city like $1 and department like $2)", '%' + str(city) + '%', '%' + str(department) + '%')
+
+    # async def del_manager(self, manager_id):
+    #     return await self.pool.execute("DELETE FROM manager WHERE manager_id=$1", str(manager_id))
+    #
+    # async def comeback_manager(self, username, city, department, applications, manager_id):
+    #     return await self.pool.execute(
+    #         "INSERT INTO manager (username, manager_id, city, department, applications) VALUES ($1,$2,$3,$4,$5)",
+    #         username, manager_id, city,
+    #         department, applications)
+
+    async def update_manager(self, manager_id):
+        return await self.pool.execute('update manager set number = (select max(number) from manager) + 1, applications = applications+1 where manager_id = $1', manager_id)
+
