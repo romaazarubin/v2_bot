@@ -80,7 +80,7 @@ async def cd(call: CallbackQuery, callback_data: dict):
         await call.message.edit_text(text=f'Ваш менеджер - {"@" + str(manager["username"])}')
         await bot.send_message(manager['manager_id'], text=f'Контакт клиента - @{call.from_user.username}')
         await db.add_request(callback_data.get('user_id'), callback_data.get('city'), callback_data.get('option'))
-        await db.manager_app_add(call.from_user.username.lower(), call.message.date.date(),
+        await db.manager_app_add(str(manager["username"]).lower(), call.message.date.date(),
                                  callback_data.get('option').lower(), callback_data.get('city'))
         # await db.del_manager(manager['manager_id'])
         # await db.comeback_manager(manager['username'], manager['city'], manager['department'], manager['applications'],
